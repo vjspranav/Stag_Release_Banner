@@ -1,13 +1,27 @@
+from urllib import response
 from PIL import Image, ImageDraw, ImageFont
+import requests
+import json
 import sys
 
-from zmq import device
+[ _, device_codename ] = sys.argv
 
 
-[ _, device_name, device_codename, maintainer_name, device_type ] = sys.argv
+api_url = "https://api.stag-os.org/maintainers/" + device_codename
+# Do a get request to get details
+response = requests.get(api_url)
+response = response.json()
 
+with open('deviceType.json', 'r') as f:
+    data = json.load(f)
+
+device_type = data[device_codename]
+maintainer_name = response['data']['tg_username']
+device_name = response['data']['device_name']
+
+if 'MiAtoll' in device_name:
+    device_name = 'Miatoll 720G series'
 im=Image.open("templates/" + device_type+".png")
-
 font_style = "nevis.ttf"
 draw=ImageDraw.Draw(im)
 image_width, image_heigth=im.size
